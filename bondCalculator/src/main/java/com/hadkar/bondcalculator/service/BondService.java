@@ -98,4 +98,34 @@ public class BondService {
         }
         throw new RuntimeException("Rate solving did not converge");
     }
+
+    public double calculateAccruedInterestWithDayCount(double face, double couponRate, LocalDate settle, LocalDate lastCoupon, int frequency, String dayCountConvention) {
+        double periodFraction;
+
+        switch (dayCountConvention.toUpperCase()) {
+            case "30/360":
+                int d1 = Math.min(30, lastCoupon.getDayOfMonth());
+                int d2 = Math.min(30, settle.getDayOfMonth());
+                int months = (settle.getYear() - lastCoupon.getYear()) * 12 + settle.getMonthValue() - lastCoupon.getMonthValue();
+                periodFraction = (360 * (settle.getYear() - lastCoupon.getYear()) + 30 * (settle.getMonthValue() - lastCoupon.getMonthValue()) + (d2 - d1)) / 360.0;
+                break;
+            case "ACT/360":
+                long actual360 = ChronoUnit.DAYS.between(lastCoupon, settle);
+                periodFraction = actual360 / 360.0;
+                break;
+            case "ACT/365":
+                long actual365 = ChronoUnit.DAYS.between(lastCoupon, settle);
+                periodFraction = actual365 / 365.0;
+                break;
+            case "ACT/ACT":
+                long actualDays = ChronoUnit.DAYS.between(lastCoupon, settle);
+                double yearLength = lastCoupon.isLeapYear() ? 366.0 : 365.0;
+                periodFraction = actualDays / yearLength;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported day count convention: " + dayCountConvention);
+        }
+
+        return (face * couponRate) * periodFraction;
+    }
 }
