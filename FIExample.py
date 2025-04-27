@@ -90,3 +90,90 @@ european_callable = calc.create_european_callable_bond(
     day_count=ql.Thirty360(),
     issue_date=issue_date
 )
+
+def create_puttable_bond(self, face_amount, schedule, coupons, day_count, issue_date, put_dates, put_price):
+    bond = ql.PuttableFixedRateBond(
+        0,
+        face_amount,
+        schedule,
+        coupons,
+        day_count,
+        ql.Following,
+        100.0,
+        issue_date,
+        ql.CallabilitySchedule([
+            ql.Callability(
+                ql.CallabilityPrice(put_price, ql.CallabilityPrice.Clean),
+                ql.Callability.Put,
+                put_date
+            ) for put_date in put_dates
+        ])
+    )
+    return bond
+
+
+def create_step_coupon_bond(self, face_amount, schedule, coupon_steps, day_count, issue_date, payment_convention):
+    """coupon_steps = list of (date, coupon)"""
+    coupons = []
+    last_rate = 0.0
+    for d in schedule:
+        matching_steps = [c for (step_date, c) in coupon_steps if d >= step_date]
+        if matching_steps:
+            last_rate = matching_steps[-1]
+        coupons.append(last_rate)
+    bond = ql.FixedRateBond(
+        0,
+        face_amount,
+        schedule,
+        coupons,
+        day_count,
+        payment_convention,
+        100.0,
+        issue_date
+    )
+    return bond
+
+
+def create_sinking_fund_bond(self, face_amount, schedule, coupons, principal_reduction, day_count, issue_date, payment_convention):
+    bond = ql.FixedRateBond(
+        0,
+        face_amount,
+        schedule,
+        coupons,
+        day_count,
+        payment_convention,
+        100.0,
+        issue_date
+    )
+
+    # Adjust cashflows manually
+    for cf in bond.cashflows():
+        if isinstance(cf, ql.Redeemable):
+            date = cf.date()
+            reduction = principal_reduction.get(date, 0.0)
+            if reduction:
+                cf.setAmount(cf.amount() * (1 - reduction))
+    return bond
+
+
+def create_european_callable_bond(self, face_amount, schedule, coupons, call_date, call_price, day_count, issue_date):
+    call_schedule = ql.CallabilitySchedule([
+        ql.Callability(
+            ql.CallabilityPrice(call_price, ql.CallabilityPrice.Clean),
+            ql.Callability.Call,
+            call_date
+        )
+    ])
+    bond = ql.CallableFixedRateBond(
+        0,
+        face_amount,
+        schedule,
+        coupons,
+        day_count,
+        ql.Following,
+        100.0,
+        issue_date,
+        call_schedule
+    )
+    return bond
+
