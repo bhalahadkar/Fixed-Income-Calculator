@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import QuantLib as ql
+
+
+# In[3]:
+
+
+value_date = ql.Date(1, ql.May, 2025)
+
+
+# In[4]:
+
+
+ql.Settings.instance().evaluationDate = value_date
+
+
+# In[5]:
+
+
+settlement_days = 1
+
+
+# In[6]:
+
+
+face_amount = 1000000.0
+
+
+# In[7]:
+
+
+day_counter = ql.Thirty360(ql.Thirty360.BondBasis)
+
+
+# In[8]:
+
+
+coupons = [6.02]
+
+
+# In[9]:
+
+
+schedule = ql.MakeSchedule(
+    effectiveDate=ql.Date(25, ql.September, 2015),
+    terminationDate=ql.Date(1, ql.October, 2027),
+    firstDate=ql.Date(1, ql.April, 2016),
+    frequency=ql.Semiannual,
+    calendar=ql.TARGET(),
+    convention=ql.Following,
+    backwards=True,
+)
+
+
+# In[10]:
+
+
+for d in schedule:
+    print(d)
+
+
+# In[11]:
+
+
+settlement_days = 1
+face_amount = 1000000.0
+coupons = [0.0425]
+day_counter = ql.Thirty360(ql.Thirty360.BondBasis)
+
+
+# In[12]:
+
+
+bond = ql.FixedRateBond(
+    settlement_days,
+    face_amount,
+    schedule,
+    coupons,
+    day_counter,
+)
+
+
+# In[14]:
+
+
+bond_yield = 0.0415
+price = bond.cleanPrice(bond_yield, day_counter, ql.Compounded, ql.Annual)
+accrual = bond.accruedAmount()
+accrualAmt = accrual*face_amount
+print(f"Price:   {price:.6}")
+print(f"accrualAmt: {accrual:.4}")
+
+
+# In[15]:
+
+
+bond_yield = 0.0415
+price = bond.cleanPrice(bond_yield, day_counter, ql.Compounded, ql.Semiannual)
+accrual = bond.accruedAmount()
+accrualAmt = accrual*face_amount
+print(f"Price:   {price:.6}")
+print(f"accrualAmt: {accrual:.4}")
+
+
+# In[16]:
+
+
+bond_yield = 0.0415
+price = bond.cleanPrice(bond_yield, day_counter, ql.Compounded, ql.Semiannual)
+accrual = bond.accruedAmount()
+accrualAmt = accrual*face_amount
+print(f"Price:   {price:.6}")
+print(f"accrualAmt: {accrual:.4}")
+print(f"accrual: {accrual:.4}")
+
+
+# In[20]:
+
+
+bond_yield = 0.0415
+price = bond.cleanPrice(bond_yield, day_counter, ql.Compounded, ql.Semiannual)
+accrual = bond.accruedAmount()
+accrualAmt = accrual*20000/100
+print(f"Price:   {price:.6}")
+print(f"accrualAmt: {accrualAmt:.10}")
+print(f"accrual: {accrual:.4}")
+
+
+# In[ ]:
+
+
+bond_price = 0.0415
+price = bond.cleanPrice(bond_yield, day_counter, ql.Compounded, ql.Semiannual)
+accrual = bond.accruedAmount()
+accrualAmt = accrual*20000/100
+print(f"Price:   {price:.6}")
+print(f"accrualAmt: {accrualAmt:.10}")
+print(f"accrual: {accrual:.4}")
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
