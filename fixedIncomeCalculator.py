@@ -2,7 +2,7 @@ import QuantLib as ql
 from typing import List, Dict, Optional
 
 class FixedIncomeCalculator:
-    def __init__(self, settlement_date: ql.Date, calendar=ql.UnitedStates()):
+    def __init__(self, settlement_date: ql.Date, calendar=ql.UnitedStates(ql.UnitedStates.GovernmentBond)):
         self.settlement_date = settlement_date
         self.calendar = calendar
         ql.Settings.instance().evaluationDate = settlement_date
@@ -126,4 +126,3 @@ class FixedIncomeCalculator:
             if isinstance(cf, ql.FixedRateCoupon):
                 cf.setAmount(cf.amount() * factor)
         return bond
-
